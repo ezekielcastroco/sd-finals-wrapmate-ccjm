@@ -1,50 +1,20 @@
-import {
-  useRefineOptions,
-  useActiveAuthProvider,
-  useLogout,
-} from "@refinedev/core";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useRefineOptions } from "@refinedev/core";
 import { ThemeToggle } from "@/components/refine-ui/theme/theme-toggle";
-import { UserAvatar } from "@/components/refine-ui/layout/user-avatar";
 import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar";
-import { LogOutIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Header = () => {
   const { isMobile } = useSidebar();
 
-  return <>{isMobile ? <MobileHeader /> : <DesktopHeader />}</>;
-};
+  // Desktop no longer needs a top header bar: theme switching and the user
+  // menu now live in the sidebar footer. Mobile keeps a slim header with the
+  // sidebar trigger + brand so the menu is reachable on small screens.
+  if (!isMobile) {
+    return null;
+  }
 
-function DesktopHeader() {
-  return (
-    <header
-      className={cn(
-        "sticky",
-        "top-0",
-        "flex",
-        "h-16",
-        "shrink-0",
-        "items-center",
-        "gap-4",
-        "border-b",
-        "border-border",
-        "bg-sidebar",
-        "pr-3",
-        "justify-end",
-        "z-40"
-      )}
-    >
-      <ThemeToggle />
-      <UserDropdown />
-    </header>
-  );
-}
+  return <MobileHeader />;
+};
 
 function MobileHeader() {
   const { open, isMobile } = useSidebar();
@@ -117,38 +87,5 @@ function MobileHeader() {
   );
 }
 
-const UserDropdown = () => {
-  const { mutate: logout, isPending: isLoggingOut } = useLogout();
-
-  const authProvider = useActiveAuthProvider();
-
-  if (!authProvider?.getIdentity) {
-    return null;
-  }
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <UserAvatar />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={() => {
-            logout();
-          }}
-        >
-          <LogOutIcon
-            className={cn("text-destructive", "hover:text-destructive")}
-          />
-          <span className={cn("text-destructive", "hover:text-destructive")}>
-            {isLoggingOut ? "Logging out..." : "Logout"}
-          </span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
 Header.displayName = "Header";
 MobileHeader.displayName = "MobileHeader";
-DesktopHeader.displayName = "DesktopHeader";
