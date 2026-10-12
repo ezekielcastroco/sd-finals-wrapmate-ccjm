@@ -35,7 +35,7 @@ export function Sidebar() {
 
   return (
     <ShadcnSidebar
-      collapsible="none"
+      collapsible="offcanvas"
       className={cn("border-r", "border-sidebar-border", "bg-sidebar")}
     >
       <SidebarHeader />
@@ -154,8 +154,13 @@ function SidebarFooter() {
         </div>
       </div>
 
-      {/* Actions row: Settings (left) + stacked theme toggle / logout (right) */}
-      <div className={cn("flex", "items-end", "justify-between", "gap-2")}>
+      {/* Theme toggle sits on its own row, above the logout. */}
+      <div className={cn("flex", "justify-end")}>
+        <ThemeToggle className={cn("h-9", "w-9")} />
+      </div>
+
+      {/* Actions row: Settings (left) + logout (right) */}
+      <div className={cn("flex", "items-center", "justify-between", "gap-2")}>
         <Button
           asChild
           variant="ghost"
@@ -175,33 +180,29 @@ function SidebarFooter() {
           </Link>
         </Button>
 
-        <div className={cn("flex", "flex-col", "items-center", "gap-1.5")}>
-          <ThemeToggle className={cn("h-9", "w-9")} />
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => logout()}
-                aria-label="Logout"
-                className={cn(
-                  "h-9",
-                  "w-9",
-                  "shrink-0",
-                  "justify-center",
-                  "p-0",
-                  "text-muted-foreground",
-                  "hover:bg-sidebar-accent",
-                  "hover:text-sidebar-accent-foreground"
-                )}
-              >
-                <LogOut className={cn("h-4", "w-4")} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Logout</TooltipContent>
-          </Tooltip>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => logout()}
+              aria-label="Logout"
+              className={cn(
+                "h-9",
+                "w-9",
+                "shrink-0",
+                "justify-center",
+                "p-0",
+                "text-muted-foreground",
+                "hover:bg-sidebar-accent",
+                "hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <LogOut className={cn("h-4", "w-4")} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Logout</TooltipContent>
+        </Tooltip>
       </div>
     </ShadcnSidebarFooter>
   );
