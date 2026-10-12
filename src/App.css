@@ -233,7 +233,7 @@
 .add-order-button {
   border: 0;
   border-radius: var(--radius);
-  padding: 11px 18px;
+  padding: 14px 18px;
   background: var(--primary);
   color: var(--primary-foreground);
   font-weight: 600;
@@ -247,6 +247,7 @@
 
 .wrapmate-login-form .wrapmate-primary-button {
   width: 100%;
+  margin-top: 14px;
 }
 
 .wrapmate-error {
