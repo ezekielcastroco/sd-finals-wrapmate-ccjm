@@ -6,59 +6,41 @@ import {
   useLink,
   useLogout,
   useGetIdentity,
-  useRefineOptions,
   type TreeMenuItem,
 } from "@refinedev/core";
 import {
-  SidebarRail as ShadcnSidebarRail,
   Sidebar as ShadcnSidebar,
   SidebarContent as ShadcnSidebarContent,
   SidebarHeader as ShadcnSidebarHeader,
   SidebarFooter as ShadcnSidebarFooter,
-  useSidebar as useShadcnSidebar,
-  SidebarTrigger as ShadcnSidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ThemeToggle } from "@/components/refine-ui/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ListIcon, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Sidebar() {
-  const { open } = useShadcnSidebar();
   const { menuItems, selectedKey } = useMenu();
 
   return (
     <ShadcnSidebar
-      collapsible="icon"
-      className={cn("border-r", "border-sidebar-border")}
+      collapsible="none"
+      className={cn("border-r", "border-sidebar-border", "bg-sidebar")}
     >
-      <ShadcnSidebarRail />
       <SidebarHeader />
       <ShadcnSidebarContent
-        className={cn(
-          "transition-discrete",
-          "duration-200",
-          "flex",
-          "flex-col",
-          "gap-2",
-          "pt-2",
-          "pb-2",
-          {
-            "px-3": open,
-            "px-1": !open,
-          }
-        )}
+        className={cn("flex", "flex-col", "gap-1.5", "px-3", "py-4")}
       >
         {menuItems.map((item: TreeMenuItem) => (
           <SidebarItem
@@ -72,6 +54,39 @@ export function Sidebar() {
     </ShadcnSidebar>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Header                                                              */
+/* ------------------------------------------------------------------ */
+
+function SidebarHeader() {
+  return (
+    <ShadcnSidebarHeader
+      className={cn(
+        "h-16",
+        "flex-row",
+        "items-center",
+        "gap-2.5",
+        "border-b",
+        "border-sidebar-border",
+        "px-5"
+      )}
+    >
+      <img
+        src="/logo-mark.png"
+        alt="WrapMate"
+        className={cn("h-8", "w-8", "shrink-0", "object-contain")}
+      />
+      <h2 className={cn("text-base", "font-bold", "tracking-tight")}>
+        WrapMate
+      </h2>
+    </ShadcnSidebarHeader>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Footer                                                              */
+/* ------------------------------------------------------------------ */
 
 type FooterIdentity = {
   username?: string;
@@ -90,7 +105,6 @@ function capitalize(value?: string) {
 }
 
 function SidebarFooter() {
-  const { open } = useShadcnSidebar();
   const Link = useLink();
   const { data: identity } = useGetIdentity<FooterIdentity>();
   const { mutate: logout } = useLogout();
@@ -103,22 +117,15 @@ function SidebarFooter() {
     <ShadcnSidebarFooter
       className={cn(
         "mt-auto",
-        "gap-2",
+        "gap-3",
         "border-t",
         "border-sidebar-border",
         "bg-sidebar",
-        {
-          "p-3": open,
-          "p-2": !open,
-        }
+        "p-3"
       )}
     >
-      {/* User row (avatar + name/role) */}
-      <div
-        className={cn("flex", "items-center", "gap-2.5", {
-          "justify-center": !open,
-        })}
-      >
+      {/* User row */}
+      <div className={cn("flex", "items-center", "gap-2.5")}>
         <Avatar className={cn("h-9", "w-9", "shrink-0")}>
           {avatar && <AvatarImage src={avatar} alt={username} />}
           <AvatarFallback
@@ -133,29 +140,22 @@ function SidebarFooter() {
           </AvatarFallback>
         </Avatar>
 
-        {open && (
-          <div className={cn("flex", "min-w-0", "flex-1", "flex-col", "leading-tight")}>
-            <span className={cn("truncate", "text-sm", "font-semibold")}>
-              {username}
+        <div
+          className={cn("flex", "min-w-0", "flex-1", "flex-col", "leading-tight")}
+        >
+          <span className={cn("truncate", "text-sm", "font-semibold")}>
+            {username}
+          </span>
+          {role && (
+            <span className={cn("truncate", "text-xs", "text-muted-foreground")}>
+              {role}
             </span>
-            {role && (
-              <span
-                className={cn("truncate", "text-xs", "text-muted-foreground")}
-              >
-                {role}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Settings + logout row */}
-      <div
-        className={cn("flex", "items-center", "gap-2", {
-          "flex-col": !open,
-          "justify-between": open,
-        })}
-      >
+      {/* Actions row: Settings (left) + stacked theme toggle / logout (right) */}
+      <div className={cn("flex", "items-end", "justify-between", "gap-2")}>
         <Button
           asChild
           variant="ghost"
@@ -166,41 +166,50 @@ function SidebarFooter() {
             "gap-2",
             "text-muted-foreground",
             "hover:bg-sidebar-accent",
-            "hover:text-sidebar-accent-foreground",
-            {
-              "flex-1 justify-start": open,
-              "h-9 w-9 justify-center p-0": !open,
-            }
+            "hover:text-sidebar-accent-foreground"
           )}
         >
           <Link to="/settings">
             <Settings className={cn("h-4", "w-4", "shrink-0")} />
-            {open && <span>Settings</span>}
+            <span>Settings</span>
           </Link>
         </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => logout()}
-          aria-label="Log out"
-          className={cn(
-            "h-9",
-            "w-9",
-            "shrink-0",
-            "justify-center",
-            "p-0",
-            "text-muted-foreground",
-            "hover:bg-sidebar-accent",
-            "hover:text-sidebar-accent-foreground"
-          )}
-        >
-          <LogOut className={cn("h-4", "w-4")} />
-        </Button>
+        <div className={cn("flex", "flex-col", "items-center", "gap-1.5")}>
+          <ThemeToggle className={cn("h-9", "w-9")} />
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => logout()}
+                aria-label="Logout"
+                className={cn(
+                  "h-9",
+                  "w-9",
+                  "shrink-0",
+                  "justify-center",
+                  "p-0",
+                  "text-muted-foreground",
+                  "hover:bg-sidebar-accent",
+                  "hover:text-sidebar-accent-foreground"
+                )}
+              >
+                <LogOut className={cn("h-4", "w-4")} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Logout</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
     </ShadcnSidebarFooter>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Nav items                                                           */
+/* ------------------------------------------------------------------ */
 
 type MenuItemProps = {
   item: TreeMenuItem;
@@ -208,17 +217,12 @@ type MenuItemProps = {
 };
 
 function SidebarItem({ item, selectedKey }: MenuItemProps) {
-  const { open } = useShadcnSidebar();
-
   if (item.meta?.group) {
     return <SidebarItemGroup item={item} selectedKey={selectedKey} />;
   }
 
   if (item.children && item.children.length > 0) {
-    if (open) {
-      return <SidebarItemCollapsible item={item} selectedKey={selectedKey} />;
-    }
-    return <SidebarItemDropdown item={item} selectedKey={selectedKey} />;
+    return <SidebarItemCollapsible item={item} selectedKey={selectedKey} />;
   }
 
   return <SidebarItemLink item={item} selectedKey={selectedKey} />;
@@ -226,34 +230,24 @@ function SidebarItem({ item, selectedKey }: MenuItemProps) {
 
 function SidebarItemGroup({ item, selectedKey }: MenuItemProps) {
   const { children } = item;
-  const { open } = useShadcnSidebar();
 
   return (
-    <div className={cn("border-t", "border-sidebar-border", "pt-4")}>
+    <div className={cn("border-t", "border-sidebar-border", "pt-4", "mt-2")}>
       <span
         className={cn(
           "ml-3",
+          "mb-1",
           "block",
           "text-xs",
           "font-semibold",
           "uppercase",
-          "text-muted-foreground",
-          "transition-all",
-          "duration-200",
-          {
-            "h-8": open,
-            "h-0": !open,
-            "opacity-0": !open,
-            "opacity-100": open,
-            "pointer-events-none": !open,
-            "pointer-events-auto": open,
-          }
+          "text-muted-foreground"
         )}
       >
         {getDisplayName(item)}
       </span>
       {children && children.length > 0 && (
-        <div className={cn("flex", "flex-col")}>
+        <div className={cn("flex", "flex-col", "gap-1.5")}>
           {children.map((child: TreeMenuItem) => (
             <SidebarItem
               key={child.key || child.name}
@@ -289,7 +283,7 @@ function SidebarItemCollapsible({ item, selectedKey }: MenuItemProps) {
       <CollapsibleTrigger asChild>
         <SidebarButton item={item} rightIcon={chevronIcon} />
       </CollapsibleTrigger>
-      <CollapsibleContent className={cn("ml-6", "flex", "flex-col", "gap-2")}>
+      <CollapsibleContent className={cn("ml-6", "mt-1.5", "flex", "flex-col", "gap-1.5")}>
         {children?.map((child: TreeMenuItem) => (
           <SidebarItem
             key={child.key || child.name}
@@ -302,113 +296,9 @@ function SidebarItemCollapsible({ item, selectedKey }: MenuItemProps) {
   );
 }
 
-function SidebarItemDropdown({ item, selectedKey }: MenuItemProps) {
-  const { children } = item;
-  const Link = useLink();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <SidebarButton item={item} />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="start">
-        {children?.map((child: TreeMenuItem) => {
-          const { key: childKey } = child;
-          const isSelected = childKey === selectedKey;
-
-          return (
-            <DropdownMenuItem key={childKey || child.name} asChild>
-              <Link
-                to={child.route || ""}
-                className={cn("flex w-full items-center gap-2", {
-                  "bg-accent text-accent-foreground": isSelected,
-                })}
-              >
-                <ItemIcon
-                  icon={child.meta?.icon ?? child.icon}
-                  isSelected={isSelected}
-                />
-                <span>{getDisplayName(child)}</span>
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 function SidebarItemLink({ item, selectedKey }: MenuItemProps) {
   const isSelected = item.key === selectedKey;
-
   return <SidebarButton item={item} isSelected={isSelected} asLink={true} />;
-}
-
-function SidebarHeader() {
-  const { title } = useRefineOptions();
-  const { open, isMobile } = useShadcnSidebar();
-
-  return (
-    <ShadcnSidebarHeader
-      className={cn(
-        "p-0",
-        "h-16",
-        "border-b",
-        "border-border",
-        "flex-row",
-        "items-center",
-        "justify-between",
-        "overflow-hidden"
-      )}
-    >
-      <div
-        className={cn(
-          "whitespace-nowrap",
-          "flex",
-          "flex-row",
-          "h-full",
-          "items-center",
-          "justify-start",
-          "gap-2",
-          "transition-discrete",
-          "duration-200",
-          {
-            "pl-3": !open,
-            "pl-5": open,
-          }
-        )}
-              >
-        <img
-          src="/logo-mark.png"
-          alt="WrapMate"
-          className="h-8 w-8 object-contain"
-        />
-        <h2
-          className={cn(
-            "text-sm",
-            "font-bold",
-            "transition-opacity",
-            "duration-200",
-            {
-              "opacity-0": !open,
-              "opacity-100": open,
-            }
-          )}
-        >
-          WrapMate
-        </h2>
-      </div>
-
-      <ShadcnSidebarTrigger
-        className={cn("text-muted-foreground", "mr-1.5", {
-          "opacity-0": !open,
-          "opacity-100": open || isMobile,
-          "pointer-events-auto": open || isMobile,
-          "pointer-events-none": !open && !isMobile,
-        })}
-      />
-    </ShadcnSidebarHeader>
-  );
 }
 
 function getDisplayName(item: TreeMenuItem) {
@@ -423,7 +313,7 @@ type IconProps = {
 function ItemIcon({ icon, isSelected }: IconProps) {
   return (
     <div
-      className={cn("w-4", {
+      className={cn("w-4", "shrink-0", {
         "text-muted-foreground": !isSelected,
         "text-sidebar-primary-foreground": isSelected,
       })}
@@ -479,7 +369,7 @@ function SidebarButton({
       variant="ghost"
       size="lg"
       className={cn(
-        "flex w-full items-center justify-start gap-2 py-2 !px-3 text-sm rounded-md",
+        "flex w-full items-center justify-start gap-2.5 py-2 !px-3 text-sm rounded-md h-11",
         {
           "bg-sidebar-primary": isSelected,
           "hover:!bg-sidebar-primary/90": isSelected,
@@ -494,7 +384,7 @@ function SidebarButton({
       {...props}
     >
       {asLink && item.route ? (
-        <Link to={item.route} className={cn("flex w-full items-center gap-2")}>
+        <Link to={item.route} className={cn("flex w-full items-center gap-2.5")}>
           {buttonContent}
         </Link>
       ) : (
