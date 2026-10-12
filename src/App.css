@@ -177,7 +177,7 @@
 .wrapmate-login-card {
   width: 100%;
   max-width: 400px;
-  padding: 28px;
+  padding: 32px;
   background: var(--card);
   color: var(--card-foreground);
   border: 1px solid var(--border);
@@ -203,20 +203,26 @@
 .wrapmate-login-form {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
 .wrapmate-login-form label {
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   color: var(--muted-foreground);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
 }
 
+/* Add extra space before each field group (except the first) */
+.wrapmate-login-form label:not(:first-child) {
+  margin-top: 10px;
+}
+
 .wrapmate-login-form input,
 .orders-toolbar input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: var(--background);
   color: var(--foreground);
   border: 1px solid var(--border);
@@ -233,7 +239,7 @@
 .add-order-button {
   border: 0;
   border-radius: var(--radius);
-  padding: 11px 18px;
+  padding: 14px 18px;
   background: var(--primary);
   color: var(--primary-foreground);
   font-weight: 600;
@@ -247,6 +253,7 @@
 
 .wrapmate-login-form .wrapmate-primary-button {
   width: 100%;
+  margin-top: 16px;
 }
 
 .wrapmate-error {
