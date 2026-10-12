@@ -124,7 +124,7 @@ function SidebarFooter() {
         "p-3"
       )}
     >
-      {/* User row */}
+      {/* User row: avatar + name/role (left) + theme toggle (far right) */}
       <div className={cn("flex", "items-center", "gap-2.5")}>
         <Avatar className={cn("h-9", "w-9", "shrink-0")}>
           {avatar && <AvatarImage src={avatar} alt={username} />}
@@ -152,11 +152,8 @@ function SidebarFooter() {
             </span>
           )}
         </div>
-      </div>
 
-      {/* Theme toggle sits on its own row, above the logout. */}
-      <div className={cn("flex", "justify-end")}>
-        <ThemeToggle className={cn("h-9", "w-9")} />
+        <ThemeToggle className={cn("h-9", "w-9", "shrink-0")} />
       </div>
 
       {/* Actions row: Settings (left) + logout (right) */}
