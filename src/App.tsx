@@ -1,5 +1,4 @@
 import { Authenticated, Refine } from "@refinedev/core";
-import { useGetIdentity, useLogout } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
@@ -17,32 +16,15 @@ import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
 import Dashboard from "./pages/dashboard";
 import Orders from "./pages/orders";
+import Products from "./pages/products";
+import Records from "./pages/records";
+import Analytics from "./pages/analytics";
+import Users from "./pages/users";
+import Settings from "./pages/settings";
 import { SignInForm } from "./components/refine-ui/form/sign-in-form";
 import { SignUpForm } from "./components/refine-ui/form/sign-up-form";
-import { Home, Package } from "lucide-react";
+import { Home, Package, Tag, Table, BarChart3, Users as UsersIcon } from "lucide-react";
 import { Layout } from "./components/refine-ui/layout/layout";
-
-type Identity = {
-  username?: string;
-  role?: string;
-};
-
-function UserBar() {
-  const { data: identity } = useGetIdentity<Identity>();
-  const { mutate: logout } = useLogout();
-
-  return (
-    <div className="wrapmate-user-bar">
-      <span>
-        Logged in as <strong>{identity?.username ?? "user"}</strong>
-        {identity?.role ? ` (${identity.role})` : ""}
-      </span>
-      <button type="button" onClick={() => logout()}>
-        Log out
-      </button>
-    </div>
-  );
-}
 
 function App() {
   return (
@@ -64,12 +46,32 @@ function App() {
                 {
                   name: "dashboard",
                   list: "/",
-                  meta: { label: "Home", icon: <Home /> },
+                  meta: { label: "Dashboard", icon: <Home /> },
                 },
                 {
                   name: "orders",
                   list: "/orders",
                   meta: { label: "Order Queue", icon: <Package /> },
+                },
+                {
+                  name: "products",
+                  list: "/products",
+                  meta: { label: "Products", icon: <Tag /> },
+                },
+                {
+                  name: "records",
+                  list: "/records",
+                  meta: { label: "Records", icon: <Table /> },
+                },
+                {
+                  name: "analytics",
+                  list: "/analytics",
+                  meta: { label: "Analytics", icon: <BarChart3 /> },
+                },
+                {
+                  name: "users",
+                  list: "/users",
+                  meta: { label: "Users", icon: <UsersIcon /> },
                 },
               ]}
             >
@@ -82,7 +84,6 @@ function App() {
                       fallback={<CatchAllNavigate to="/login" />}
                     >
                       <Layout>
-                        <UserBar />
                         <Outlet />
                       </Layout>
                     </Authenticated>
@@ -90,6 +91,11 @@ function App() {
                 >
                   <Route index element={<Dashboard />} />
                   <Route path="/orders" element={<Orders />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/records" element={<Records />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/users" element={<Users />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Route>
 
                 {/* Auth routes — redirect to the app if already logged in */}
