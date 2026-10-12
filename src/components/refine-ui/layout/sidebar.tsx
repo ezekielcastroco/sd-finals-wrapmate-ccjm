@@ -4,6 +4,8 @@ import React from "react";
 import {
   useMenu,
   useLink,
+  useLogout,
+  useGetIdentity,
   useRefineOptions,
   type TreeMenuItem,
 } from "@refinedev/core";
@@ -12,9 +14,12 @@ import {
   Sidebar as ShadcnSidebar,
   SidebarContent as ShadcnSidebarContent,
   SidebarHeader as ShadcnSidebarHeader,
+  SidebarFooter as ShadcnSidebarFooter,
   useSidebar as useShadcnSidebar,
   SidebarTrigger as ShadcnSidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/refine-ui/theme/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +32,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ListIcon } from "lucide-react";
+import { ChevronRight, ListIcon, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Sidebar() {
@@ -63,7 +68,149 @@ export function Sidebar() {
           />
         ))}
       </ShadcnSidebarContent>
+      <SidebarFooter />
     </ShadcnSidebar>
+  );
+}
+
+type FooterIdentity = {
+  username?: string;
+  role?: string;
+};
+
+function getUserInitials(username?: string) {
+  if (!username) return "U";
+  return username.slice(0, 2).toUpperCase();
+}
+
+function capitalize(value?: string) {
+  if (!value) return "";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function SidebarFooter() {
+  const { open } = useShadcnSidebar();
+  const Link = useLink();
+  const { data: identity } = useGetIdentity<FooterIdentity>();
+  const { mutate: logout } = useLogout();
+
+  const username = identity?.username ?? "User";
+  const role = capitalize(identity?.role);
+
+  return (
+    <ShadcnSidebarFooter
+      className={cn(
+        "border-t",
+        "border-sidebar-border",
+        "gap-2",
+        "p-2",
+        { "p-1": !open }
+      )}
+    >
+      {/* User + theme toggle row */}
+      <div
+        className={cn("flex", "items-center", "gap-2", {
+          "justify-center": !open,
+          "px-1": open,
+        })}
+      >
+        <Avatar className={cn("h-8", "w-8", "shrink-0")}>
+          <AvatarFallback
+            className={cn(
+              "bg-sidebar-primary",
+              "text-sidebar-primary-foreground",
+              "text-xs",
+              "font-semibold"
+            )}
+          >
+            {getUserInitials(identity?.username)}
+          </AvatarFallback>
+        </Avatar>
+
+        <div
+          className={cn(
+            "flex",
+            "min-w-0",
+            "flex-1",
+            "flex-col",
+            "leading-tight",
+            "transition-opacity",
+            "duration-200",
+            {
+              "opacity-100": open,
+              "opacity-0 w-0 pointer-events-none hidden": !open,
+            }
+          )}
+        >
+          <span className={cn("truncate", "text-sm", "font-semibold")}>
+            {username}
+          </span>
+          {role && (
+            <span className={cn("truncate", "text-xs", "text-muted-foreground")}>
+              {role}
+            </span>
+          )}
+        </div>
+
+        <ThemeToggle
+          className={cn("h-8", "w-8", "shrink-0", {
+            hidden: !open,
+          })}
+        />
+      </div>
+
+      {/* Settings + logout row */}
+      <div
+        className={cn("flex", "items-center", "gap-1", {
+          "flex-col": !open,
+          "justify-between": open,
+        })}
+      >
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "flex",
+            "items-center",
+            "gap-2",
+            "text-muted-foreground",
+            "hover:bg-sidebar-accent",
+            {
+              "flex-1 justify-start": open,
+              "w-9 justify-center p-0": !open,
+            }
+          )}
+        >
+          <Link to="/settings">
+            <Settings className={cn("h-4", "w-4", "shrink-0")} />
+            <span
+              className={cn({
+                "opacity-0 w-0 hidden": !open,
+              })}
+            >
+              Settings
+            </span>
+          </Link>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => logout()}
+          aria-label="Log out"
+          className={cn(
+            "text-muted-foreground",
+            "hover:bg-sidebar-accent",
+            {
+              "w-9 justify-center p-0": true,
+            }
+          )}
+        >
+          <LogOut className={cn("h-4", "w-4")} />
+        </Button>
+      </div>
+    </ShadcnSidebarFooter>
   );
 }
 
@@ -344,12 +491,14 @@ function SidebarButton({
       variant="ghost"
       size="lg"
       className={cn(
-        "flex w-full items-center justify-start gap-2 py-2 !px-3 text-sm",
+        "flex w-full items-center justify-start gap-2 py-2 !px-3 text-sm rounded-md",
         {
           "bg-sidebar-primary": isSelected,
           "hover:!bg-sidebar-primary/90": isSelected,
           "text-sidebar-primary-foreground": isSelected,
           "hover:text-sidebar-primary-foreground": isSelected,
+          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground":
+            !isSelected,
         },
         className
       )}
