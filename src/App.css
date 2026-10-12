@@ -1246,4 +1246,22 @@
   .wrapmate-user-bar {
     justify-content: space-between;
   }
+
+  /* Charts a touch shorter on phones */
+  .dashboard-chart {
+    height: 240px;
+  }
+
+  /* Settings page spacing on phones */
+  .settings-card {
+    padding: 18px;
+  }
+
+  .settings-title {
+    font-size: 1.5rem;
+  }
+
+  .settings-avatar-row {
+    flex-wrap: wrap;
+  }
 }
