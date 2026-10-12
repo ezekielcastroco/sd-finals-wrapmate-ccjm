@@ -501,6 +501,20 @@
   background: var(--card);
 }
 
+/* Dashboard Charts (Recharts) */
+
+.dashboard-chart {
+  width: 100%;
+  height: 280px;
+  margin-top: 4px;
+}
+
+/* Keep Recharts focus outlines from showing a hard rectangle */
+.dashboard-chart svg:focus,
+.dashboard-chart .recharts-surface:focus {
+  outline: none;
+}
+
 .packaging-overview {
   display: flex;
   flex-direction: column;
