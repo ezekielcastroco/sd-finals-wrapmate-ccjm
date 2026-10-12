@@ -143,6 +143,16 @@ export const authProvider: AuthProvider = {
       };
     }
 
+    if (password.length < 8) {
+      return {
+        success: false,
+        error: {
+          name: "Register failed",
+          message: "Password must be at least 8 characters long.",
+        },
+      };
+    }
+
     const canonicalEmail = resolveIdentifier(email);
     const users = loadUsers();
 
@@ -166,12 +176,13 @@ export const authProvider: AuthProvider = {
     users.push(newUser);
     saveUsers(users);
 
-    setCurrentUser({
-      username: usernameFromEmail(newUser.email),
-      role: newUser.role,
-    });
-
-    return { success: true, redirectTo: "/" };
+    // Professional flow: do NOT auto-login. The user is sent to the login
+    // page to sign in with the credentials they just created. The success
+    // toast is shown by the SignUpForm's onSuccess handler.
+    return {
+      success: true,
+      redirectTo: "/login",
+    };
   },
 
   async logout() {

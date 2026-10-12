@@ -37,6 +37,27 @@ export const SignUpForm = () => {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email.trim())) {
+      open?.({
+        type: "error",
+        message: "Invalid email",
+        description: "Please enter a valid email address.",
+      });
+
+      return;
+    }
+
+    if (password.length < 8) {
+      open?.({
+        type: "error",
+        message: "Password too short",
+        description: "Your password must be at least 8 characters long.",
+      });
+
+      return;
+    }
+
     if (password !== confirmPassword) {
       open?.({
         type: "error",
@@ -48,10 +69,25 @@ export const SignUpForm = () => {
       return;
     }
 
-    register({
-      email,
-      password,
-    });
+    register(
+      {
+        email: email.trim(),
+        password,
+      },
+      {
+        onSuccess: (data) => {
+          // Only celebrate a genuine success; a failed register still
+          // resolves (success: false) and Refine shows its own error toast.
+          if (data?.success) {
+            open?.({
+              type: "success",
+              message: "Account created successfully",
+              description: "Please sign in with your new credentials.",
+            });
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -111,8 +147,12 @@ export const SignUpForm = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
                 required
               />
+              <p className={cn("text-xs", "text-muted-foreground")}>
+                Must be at least 8 characters long.
+              </p>
             </div>
 
             <div
