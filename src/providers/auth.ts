@@ -16,11 +16,21 @@ export type WrapMateUser = {
   role: UserRole;
 };
 
+/** Editable profile fields shown on the Settings page. */
+export type UserProfile = {
+  firstName: string;
+  middleInitial: string;
+  lastName: string;
+  email: string;
+  avatar: string; // data URL or empty string
+};
+
 /** A stored account record. */
 type StoredUser = {
   email: string;
   password: string;
   role: UserRole;
+  profile?: UserProfile;
 };
 
 const USERS_KEY = "wrapmate_users";
@@ -89,6 +99,97 @@ export function getCurrentUser(): WrapMateUser | null {
     localStorage.removeItem(CURRENT_USER_KEY);
     return null;
   }
+}
+
+/** Build a default profile for a user that has never saved one. */
+function defaultProfile(user: StoredUser): UserProfile {
+  const username = usernameFromEmail(user.email);
+  return {
+    firstName: capitalizeWord(username),
+    middleInitial: "",
+    lastName: "",
+    email: user.email,
+    avatar: "",
+  };
+}
+
+function capitalizeWord(value: string): string {
+  if (!value) return "";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+/** Find the current logged-in user's stored record (by email). */
+function findCurrentStoredUser(): { users: StoredUser[]; index: number } | null {
+  const current = getCurrentUser();
+  if (!current) return null;
+
+  const users = loadUsers();
+  // The current user's email: resolve from alias or match by derived username.
+  const canonical = resolveIdentifier(current.username);
+  let index = users.findIndex((u) => u.email.toLowerCase() === canonical);
+
+  if (index === -1) {
+    index = users.findIndex(
+      (u) => usernameFromEmail(u.email) === current.username
+    );
+  }
+
+  if (index === -1) return null;
+  return { users, index };
+}
+
+/**
+ * Returns the current user's profile, creating sensible defaults if none has
+ * been saved yet.
+ */
+export function getProfile(): UserProfile | null {
+  const found = findCurrentStoredUser();
+  if (!found) return null;
+
+  const user = found.users[found.index];
+  return user.profile ?? defaultProfile(user);
+}
+
+/** Save the current user's profile to localStorage. Returns the saved profile. */
+export function saveProfile(
+  profile: UserProfile
+): { success: boolean; error?: string } {
+  const found = findCurrentStoredUser();
+  if (!found) return { success: false, error: "No authenticated user." };
+
+  const { users, index } = found;
+  users[index] = { ...users[index], profile };
+  saveUsers(users);
+  return { success: true };
+}
+
+/**
+ * Change the current user's password. Verifies the current password first.
+ * Really updates the stored password — the next login requires the new one.
+ */
+export function changePassword(
+  currentPassword: string,
+  newPassword: string
+): { success: boolean; error?: string } {
+  const found = findCurrentStoredUser();
+  if (!found) return { success: false, error: "No authenticated user." };
+
+  const { users, index } = found;
+
+  if (users[index].password !== currentPassword) {
+    return { success: false, error: "Your current password is incorrect." };
+  }
+
+  if (newPassword.length < 8) {
+    return {
+      success: false,
+      error: "New password must be at least 8 characters long.",
+    };
+  }
+
+  users[index] = { ...users[index], password: newPassword };
+  saveUsers(users);
+  return { success: true };
 }
 
 type AuthParams = {
@@ -207,11 +308,15 @@ export const authProvider: AuthProvider = {
     const user = getCurrentUser();
     if (!user) return null;
 
+    const profile = getProfile();
+
     return {
       id: user.username,
       name: user.username,
       username: user.username,
       role: user.role,
+      avatar: profile?.avatar || "",
+      profile: profile ?? undefined,
     };
   },
 
