@@ -1,5 +1,4 @@
 import { Authenticated, Refine } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import routerProvider, {
@@ -29,12 +28,11 @@ function App() {
     <BrowserRouter>
       <RefineKbarProvider>
         <ThemeProvider>
-          <DevtoolsProvider>
-            <Refine
-              dataProvider={dataProvider}
-              authProvider={authProvider}
-              notificationProvider={useNotificationProvider()}
-              routerProvider={routerProvider}
+          <Refine
+            dataProvider={dataProvider}
+            authProvider={authProvider}
+            notificationProvider={useNotificationProvider()}
+            routerProvider={routerProvider}
               options={{
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
@@ -105,8 +103,6 @@ function App() {
               <UnsavedChangesNotifier />
               <DocumentTitleHandler />
             </Refine>
-            <DevtoolsPanel />
-          </DevtoolsProvider>
         </ThemeProvider>
       </RefineKbarProvider>
     </BrowserRouter>
