@@ -180,6 +180,48 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {/* Quick Actions */}
+      <section className="dashboard-section">
+        <div className="dashboard-section-heading">
+          <div>
+            <h2>Quick Actions</h2>
+            <p>Access commonly used WrapMate features.</p>
+          </div>
+        </div>
+
+        <div className="dashboard-actions">
+          <button
+            type="button"
+            className="dashboard-action-card primary"
+            onClick={() => navigate("/orders")}
+          >
+            <div className="dashboard-action-icon">
+              <Plus />
+            </div>
+            <div>
+              <strong>Manage Orders</strong>
+              <span>View and process packaging orders</span>
+            </div>
+            <ArrowRight className="dashboard-action-arrow" />
+          </button>
+
+          <button
+            type="button"
+            className="dashboard-action-card"
+            onClick={() => navigate("/orders")}
+          >
+            <div className="dashboard-action-icon">
+              <Package />
+            </div>
+            <div>
+              <strong>Order Queue</strong>
+              <span>Check pending and active orders</span>
+            </div>
+            <ArrowRight className="dashboard-action-arrow" />
+          </button>
+        </div>
+      </section>
+
       {/* Statistics */}
       <section className="dashboard-stats">
         <div className="dashboard-stat-card">
@@ -381,48 +423,6 @@ export default function Dashboard() {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </div>
-      </section>
-
-      {/* Quick Actions */}
-      <section className="dashboard-section">
-        <div className="dashboard-section-heading">
-          <div>
-            <h2>Quick Actions</h2>
-            <p>Access commonly used WrapMate features.</p>
-          </div>
-        </div>
-
-        <div className="dashboard-actions">
-          <button
-            type="button"
-            className="dashboard-action-card primary"
-            onClick={() => navigate("/orders")}
-          >
-            <div className="dashboard-action-icon">
-              <Plus />
-            </div>
-            <div>
-              <strong>Manage Orders</strong>
-              <span>View and process packaging orders</span>
-            </div>
-            <ArrowRight className="dashboard-action-arrow" />
-          </button>
-
-          <button
-            type="button"
-            className="dashboard-action-card"
-            onClick={() => navigate("/orders")}
-          >
-            <div className="dashboard-action-icon">
-              <Package />
-            </div>
-            <div>
-              <strong>Order Queue</strong>
-              <span>Check pending and active orders</span>
-            </div>
-            <ArrowRight className="dashboard-action-arrow" />
-          </button>
         </div>
       </section>
 
