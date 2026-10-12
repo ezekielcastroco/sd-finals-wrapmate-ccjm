@@ -18,8 +18,7 @@ import {
   useSidebar as useShadcnSidebar,
   SidebarTrigger as ShadcnSidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/refine-ui/theme/theme-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +39,10 @@ export function Sidebar() {
   const { menuItems, selectedKey } = useMenu();
 
   return (
-    <ShadcnSidebar collapsible="icon" className={cn("border-none")}>
+    <ShadcnSidebar
+      collapsible="icon"
+      className={cn("border-r", "border-sidebar-border")}
+    >
       <ShadcnSidebarRail />
       <SidebarHeader />
       <ShadcnSidebarContent
@@ -52,8 +54,6 @@ export function Sidebar() {
           "gap-2",
           "pt-2",
           "pb-2",
-          "border-r",
-          "border-border",
           {
             "px-3": open,
             "px-1": !open,
@@ -76,6 +76,7 @@ export function Sidebar() {
 type FooterIdentity = {
   username?: string;
   role?: string;
+  avatar?: string;
 };
 
 function getUserInitials(username?: string) {
@@ -96,25 +97,30 @@ function SidebarFooter() {
 
   const username = identity?.username ?? "User";
   const role = capitalize(identity?.role);
+  const avatar = identity?.avatar;
 
   return (
     <ShadcnSidebarFooter
       className={cn(
+        "mt-auto",
+        "gap-2",
         "border-t",
         "border-sidebar-border",
-        "gap-2",
-        "p-2",
-        { "p-1": !open }
+        "bg-sidebar",
+        {
+          "p-3": open,
+          "p-2": !open,
+        }
       )}
     >
-      {/* User + theme toggle row */}
+      {/* User row (avatar + name/role) */}
       <div
-        className={cn("flex", "items-center", "gap-2", {
+        className={cn("flex", "items-center", "gap-2.5", {
           "justify-center": !open,
-          "px-1": open,
         })}
       >
-        <Avatar className={cn("h-8", "w-8", "shrink-0")}>
+        <Avatar className={cn("h-9", "w-9", "shrink-0")}>
+          {avatar && <AvatarImage src={avatar} alt={username} />}
           <AvatarFallback
             className={cn(
               "bg-sidebar-primary",
@@ -127,41 +133,25 @@ function SidebarFooter() {
           </AvatarFallback>
         </Avatar>
 
-        <div
-          className={cn(
-            "flex",
-            "min-w-0",
-            "flex-1",
-            "flex-col",
-            "leading-tight",
-            "transition-opacity",
-            "duration-200",
-            {
-              "opacity-100": open,
-              "opacity-0 w-0 pointer-events-none hidden": !open,
-            }
-          )}
-        >
-          <span className={cn("truncate", "text-sm", "font-semibold")}>
-            {username}
-          </span>
-          {role && (
-            <span className={cn("truncate", "text-xs", "text-muted-foreground")}>
-              {role}
+        {open && (
+          <div className={cn("flex", "min-w-0", "flex-1", "flex-col", "leading-tight")}>
+            <span className={cn("truncate", "text-sm", "font-semibold")}>
+              {username}
             </span>
-          )}
-        </div>
-
-        <ThemeToggle
-          className={cn("h-8", "w-8", "shrink-0", {
-            hidden: !open,
-          })}
-        />
+            {role && (
+              <span
+                className={cn("truncate", "text-xs", "text-muted-foreground")}
+              >
+                {role}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Settings + logout row */}
       <div
-        className={cn("flex", "items-center", "gap-1", {
+        className={cn("flex", "items-center", "gap-2", {
           "flex-col": !open,
           "justify-between": open,
         })}
@@ -176,21 +166,16 @@ function SidebarFooter() {
             "gap-2",
             "text-muted-foreground",
             "hover:bg-sidebar-accent",
+            "hover:text-sidebar-accent-foreground",
             {
               "flex-1 justify-start": open,
-              "w-9 justify-center p-0": !open,
+              "h-9 w-9 justify-center p-0": !open,
             }
           )}
         >
           <Link to="/settings">
             <Settings className={cn("h-4", "w-4", "shrink-0")} />
-            <span
-              className={cn({
-                "opacity-0 w-0 hidden": !open,
-              })}
-            >
-              Settings
-            </span>
+            {open && <span>Settings</span>}
           </Link>
         </Button>
 
@@ -200,11 +185,14 @@ function SidebarFooter() {
           onClick={() => logout()}
           aria-label="Log out"
           className={cn(
+            "h-9",
+            "w-9",
+            "shrink-0",
+            "justify-center",
+            "p-0",
             "text-muted-foreground",
             "hover:bg-sidebar-accent",
-            {
-              "w-9 justify-center p-0": true,
-            }
+            "hover:text-sidebar-accent-foreground"
           )}
         >
           <LogOut className={cn("h-4", "w-4")} />

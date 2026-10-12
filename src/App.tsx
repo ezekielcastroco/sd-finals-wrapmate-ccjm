@@ -16,14 +16,11 @@ import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
 import Dashboard from "./pages/dashboard";
 import Orders from "./pages/orders";
-import Products from "./pages/products";
 import Records from "./pages/records";
-import Analytics from "./pages/analytics";
-import Users from "./pages/users";
 import Settings from "./pages/settings";
 import { SignInForm } from "./components/refine-ui/form/sign-in-form";
 import { SignUpForm } from "./components/refine-ui/form/sign-up-form";
-import { Home, Package, Tag, Table, BarChart3, Users as UsersIcon } from "lucide-react";
+import { Home, Package, Table } from "lucide-react";
 import { Layout } from "./components/refine-ui/layout/layout";
 
 function App() {
@@ -54,24 +51,9 @@ function App() {
                   meta: { label: "Order Queue", icon: <Package /> },
                 },
                 {
-                  name: "products",
-                  list: "/products",
-                  meta: { label: "Products", icon: <Tag /> },
-                },
-                {
                   name: "records",
                   list: "/records",
                   meta: { label: "Records", icon: <Table /> },
-                },
-                {
-                  name: "analytics",
-                  list: "/analytics",
-                  meta: { label: "Analytics", icon: <BarChart3 /> },
-                },
-                {
-                  name: "users",
-                  list: "/users",
-                  meta: { label: "Users", icon: <UsersIcon /> },
                 },
               ]}
             >
@@ -91,10 +73,7 @@ function App() {
                 >
                   <Route index element={<Dashboard />} />
                   <Route path="/orders" element={<Orders />} />
-                  <Route path="/products" element={<Products />} />
                   <Route path="/records" element={<Records />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/users" element={<Users />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>
 
