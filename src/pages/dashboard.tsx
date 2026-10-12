@@ -5,7 +5,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   // Sample dashboard data for now.
-  // These can later be connected to your backend/database.
+  // These can later be connected to backend/database.
   const stats = {
     totalOrders: 24,
     pending: 8,
@@ -17,14 +17,14 @@ export default function Dashboard() {
     {
       id: "WM-003",
       message: "Order completed",
-      customer: "Sample Store",
+      customer: "Sample Customer 1",
       time: "10 minutes ago",
       type: "completed",
     },
     {
       id: "WM-002",
       message: "Order is processing",
-      customer: "LMJT Shop",
+      customer: "Sample Customer 2",
       time: "25 minutes ago",
       type: "processing",
     },

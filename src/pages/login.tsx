@@ -63,7 +63,7 @@ export default function Login({ onLogin }: LoginProps) {
               {error}
             </p>
           )}
-
+        
           <button type="submit" className="wrapmate-primary-button">
             Log in
           </button>
