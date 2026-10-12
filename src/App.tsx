@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import { BrowserRouter, Outlet, Route, Routes, useNavigate } from "react-router";
+import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate } from "react-router";
 import routerProvider, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
@@ -25,6 +25,16 @@ function AuthenticatedApp({ user, setUser }: {
   setUser: (user: WrapMateUser | null) => void;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // After login the URL is still "/login", but the authenticated router only
+  // knows "/" and "/orders". Without this redirect no route matches and the
+  // page renders blank. Send the user to the dashboard instead.
+  useEffect(() => {
+    if (location.pathname === "/login") {
+      navigate("/", { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   function handleLogout() {
     logout();
