@@ -310,9 +310,21 @@ export const authProvider: AuthProvider = {
 
     const profile = getProfile();
 
+    // Prefer the saved full name (First + M.I. + Last) when present,
+    // otherwise fall back to the login username.
+    const fullName = profile
+      ? [profile.firstName, profile.middleInitial, profile.lastName]
+          .map((part) => (part ?? "").trim())
+          .filter(Boolean)
+          .join(" ")
+      : "";
+
+    const displayName = fullName || user.username;
+
     return {
       id: user.username,
-      name: user.username,
+      name: displayName,
+      displayName,
       username: user.username,
       role: user.role,
       avatar: profile?.avatar || "",

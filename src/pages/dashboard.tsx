@@ -25,6 +25,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { getOrders } from "@/providers/wrapmate-store";
 
 /* -------------------------------------------------------------------------
  * MOCK DATA
@@ -37,22 +38,17 @@ import {
  * a localized change.
  * ---------------------------------------------------------------------- */
 
-const stats = {
-  totalOrders: 24,
-  plasticSavedPct: 42, // average plastic reduction across batches (PR%)
-  totalWrapUsedCm: 1860, // total bubble wrap dispensed (cm)
-  avgWrapLengthCm: 77.5, // average target length per order (cm)
-};
-
 // System Feature #5: plastic waste reduction (PR%) per SKU batch size.
 // PR = ((manual - automated) / manual) * 100
+// NOTE: this comparison needs historical manual-vs-automated measurements the
+// prototype does not collect yet, so it stays as illustrative sample data.
 const plasticReduction = [
   { batch: "Small", manual: 60, wrapmate: 38 },
   { batch: "Medium", manual: 120, wrapmate: 74 },
   { batch: "Large", manual: 210, wrapmate: 118 },
 ];
 
-// Bubble wrap dispensed per day over the last week (cm).
+// Bubble wrap dispensed per day over the last week (cm). Illustrative sample.
 const wrapUsage = [
   { day: "Mon", length: 210 },
   { day: "Tue", length: 180 },
@@ -61,37 +57,6 @@ const wrapUsage = [
   { day: "Fri", length: 390 },
   { day: "Sat", length: 300 },
   { day: "Sun", length: 200 },
-];
-
-// Current order status distribution.
-const statusBreakdown = [
-  { name: "Completed", value: 11 },
-  { name: "Processing", value: 5 },
-  { name: "Pending", value: 8 },
-];
-
-const recentActivity = [
-  {
-    id: "WM-003",
-    message: "Order completed",
-    customer: "Sample Store",
-    time: "10 minutes ago",
-    type: "completed",
-  },
-  {
-    id: "WM-002",
-    message: "Order is processing",
-    customer: "LMJT Shop",
-    time: "25 minutes ago",
-    type: "processing",
-  },
-  {
-    id: "WM-004",
-    message: "New order added",
-    customer: "New Customer",
-    time: "1 hour ago",
-    type: "new",
-  },
 ];
 
 /* -------------------------------------------------------------------------
@@ -158,6 +123,62 @@ function useChartColors(): ChartColors {
 export default function Dashboard() {
   const navigate = useNavigate();
   const colors = useChartColors();
+
+  // --- Real data derived from the shared Orders store ---
+  const orders = getOrders();
+  const totalOrders = orders.length;
+  const pendingCount = orders.filter((o) => o.status === "Pending").length;
+  const processingCount = orders.filter((o) => o.status === "Processing").length;
+  const completedCount = orders.filter((o) => o.status === "Completed").length;
+
+  const totalWrapUsedCm =
+    Math.round(
+      orders.reduce((sum, o) => sum + o.length * o.quantity, 0) * 10
+    ) / 10;
+
+  const avgWrapLengthCm =
+    totalOrders > 0
+      ? Math.round(
+          (orders.reduce((sum, o) => sum + o.length, 0) / totalOrders) * 10
+        ) / 10
+      : 0;
+
+  const stats = {
+    totalOrders,
+    // Average WrapMate plastic reduction across the sample batches (PR%).
+    plasticSavedPct: 42,
+    totalWrapUsedCm,
+    avgWrapLengthCm,
+  };
+
+  // Real order-status distribution for the donut.
+  const statusBreakdown = [
+    { name: "Completed", value: completedCount },
+    { name: "Processing", value: processingCount },
+    { name: "Pending", value: pendingCount },
+  ].filter((s) => s.value > 0);
+
+  // Recent activity from the latest orders (most recent first).
+  const recentActivity = [...orders]
+    .slice(-3)
+    .reverse()
+    .map((o) => ({
+      id: o.id,
+      message:
+        o.status === "Completed"
+          ? "Order completed"
+          : o.status === "Processing"
+            ? "Order is processing"
+            : "Order pending",
+      customer: o.customer,
+      time: o.date,
+      type:
+        o.status === "Completed"
+          ? "completed"
+          : o.status === "Processing"
+            ? "processing"
+            : "new",
+    }));
 
   const statusColors = [colors.chart1, colors.chart2, colors.chart4];
 

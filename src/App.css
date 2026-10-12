@@ -994,6 +994,16 @@
   padding: 20px;
 }
 
+.wm-modal-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
 .wm-modal-footer {
   display: flex;
   justify-content: flex-end;

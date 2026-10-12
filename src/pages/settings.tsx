@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useGetIdentity, useNotification } from "@refinedev/core";
 import { Camera, Save, KeyRound, Eye, EyeOff } from "lucide-react";
+import { IDENTITY_UPDATED_EVENT } from "@/providers/wrapmate-store";
 import {
   getProfile,
   saveProfile,
@@ -91,8 +92,10 @@ export default function Settings() {
       return;
     }
 
-    // Refresh identity so the sidebar avatar/name update immediately.
+    // Refresh this page's identity, and notify the rest of the app (sidebar)
+    // to re-read the updated profile so the name/avatar update immediately.
     refetch?.();
+    window.dispatchEvent(new Event(IDENTITY_UPDATED_EVENT));
     open?.({
       type: "success",
       message: "Profile saved",
