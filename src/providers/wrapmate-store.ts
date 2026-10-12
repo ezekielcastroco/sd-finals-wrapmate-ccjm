@@ -11,6 +11,13 @@
  * (1.0 / 2.0 / 3.0), A = 5 cm packaging allowance.
  */
 
+/**
+ * Dispatched on `window` after the user's profile changes (e.g. saving on the
+ * Settings page) so components like the sidebar footer can re-read the updated
+ * identity immediately without a full page reload.
+ */
+export const IDENTITY_UPDATED_EVENT = "wrapmate:identity-updated";
+
 export const PACKAGING_ALLOWANCE = 5; // A (cm)
 export const PROTECTION_LEVELS = [1.0, 2.0, 3.0] as const;
 export type ProtectionLevel = (typeof PROTECTION_LEVELS)[number];
@@ -99,11 +106,12 @@ function seedIfEmpty() {
     return;
   }
 
-  // Seed a few sample products.
+  // Seed a few sample BOX-SHAPED products only (square/rectangular boxes).
+  // No irregular/circular items — the perimeter formula is for boxes.
   const seededProducts: Product[] = [
-    { id: "p1", sku: "WM-PROD-001", name: "Ceramic Mug", width: 12, height: 10, image: "" },
-    { id: "p2", sku: "WM-PROD-002", name: "Dinner Plate", width: 25, height: 4, image: "" },
-    { id: "p3", sku: "WM-PROD-003", name: "Glass Vase", width: 15, height: 30, image: "" },
+    { id: "p1", sku: "WM-PROD-001", name: "Phone Box", width: 16, height: 8, image: "" },
+    { id: "p2", sku: "WM-PROD-002", name: "Earbuds Box", width: 10, height: 6, image: "" },
+    { id: "p3", sku: "WM-PROD-003", name: "Charger Box", width: 12, height: 5, image: "" },
   ];
   writeJSON(PRODUCTS_KEY, seededProducts);
   localStorage.setItem(PRODUCT_SEQ_KEY, "3");
@@ -114,12 +122,12 @@ function seedIfEmpty() {
       id: "WM-001",
       customer: "Sample Customer 1",
       productId: "p1",
-      productName: "Ceramic Mug",
+      productName: "Phone Box",
       sku: "WM-PROD-001",
-      width: 12,
-      height: 10,
+      width: 16,
+      height: 8,
       protection: 1.0,
-      length: calculateLength(12, 10, 1.0),
+      length: calculateLength(16, 8, 1.0),
       quantity: 10,
       status: "Pending",
       date: "2026-10-07",
@@ -128,12 +136,12 @@ function seedIfEmpty() {
       id: "WM-002",
       customer: "Sample Customer 2",
       productId: "p2",
-      productName: "Dinner Plate",
+      productName: "Earbuds Box",
       sku: "WM-PROD-002",
-      width: 25,
-      height: 4,
+      width: 10,
+      height: 6,
       protection: 2.0,
-      length: calculateLength(25, 4, 2.0),
+      length: calculateLength(10, 6, 2.0),
       quantity: 25,
       status: "Processing",
       date: "2026-10-07",
@@ -142,12 +150,12 @@ function seedIfEmpty() {
       id: "WM-003",
       customer: "Sample Customer 3",
       productId: "p3",
-      productName: "Glass Vase",
+      productName: "Charger Box",
       sku: "WM-PROD-003",
-      width: 15,
-      height: 30,
+      width: 12,
+      height: 5,
       protection: 3.0,
-      length: calculateLength(15, 30, 3.0),
+      length: calculateLength(12, 5, 3.0),
       quantity: 15,
       status: "Completed",
       date: "2026-10-06",

@@ -14,7 +14,16 @@ import {
 export default function Products() {
   const { open } = useNotification();
   const [products, setProducts] = useState<Product[]>(() => getProducts());
+  const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+
+  const filteredProducts = products.filter((p) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)
+    );
+  });
 
   // Form state
   const [name, setName] = useState("");
@@ -116,6 +125,15 @@ export default function Products() {
       </div>
 
       <div className="wm-card">
+        <div className="orders-toolbar">
+          <input
+            type="text"
+            placeholder="Search product name or SKU..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+
         <div className="table-wrapper">
           <table className="orders-table">
             <thead>
@@ -130,8 +148,8 @@ export default function Products() {
               </tr>
             </thead>
             <tbody>
-              {products.length > 0 ? (
-                products.map((product) => (
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
                   <tr key={product.id}>
                     <td>
                       {product.image ? (
@@ -175,7 +193,9 @@ export default function Products() {
               ) : (
                 <tr>
                   <td colSpan={7} className="empty-orders">
-                    No products yet. Click "Add Product" to create one.
+                    {search.trim()
+                      ? "No products match your search."
+                      : 'No products yet. Click "Add Product" to create one.'}
                   </td>
                 </tr>
               )}
@@ -206,13 +226,18 @@ export default function Products() {
             </div>
 
             <form onSubmit={handleSave} className="wm-modal-body">
+              <p className="wm-modal-note">
+                For box-shaped items only (square or rectangular). Enter the box
+                Width and Height in centimeters.
+              </p>
+
               <label className="wm-field">
                 <span>Name</span>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ceramic Mug"
+                  placeholder="e.g. Phone Box"
                   autoFocus
                 />
               </label>
